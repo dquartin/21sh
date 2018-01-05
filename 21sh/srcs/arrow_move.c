@@ -6,17 +6,20 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/13 16:49:58 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/02 13:53:16 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/01/05 16:44:36 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
 
-int		go_to_right(int i, int x)
+int		go_to_right(int i, int x, int prompt, struct winsize size)
 {
 	if (i < x)
 	{
-		tputs(tgetstr("nd", NULL), 100, ft_putin);
+		if ((i + prompt + 1) % size.ws_col == 0)
+			tputs(tgetstr("do", NULL), 1, ft_putin);
+		else
+			tputs(tgetstr("nd", NULL), 1, ft_putin);
 		i++;
 	}
 	return (i);
@@ -26,7 +29,7 @@ int		go_to_left(int i)
 {
 	if (i > 0)
 	{
-		tputs(tgetstr("le", NULL), 100, ft_putin);
+		tputs(tgetstr("le", NULL), 1, ft_putin);
 		i--;
 	}
 	return (i);

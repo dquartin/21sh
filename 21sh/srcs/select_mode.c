@@ -6,7 +6,7 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/15 09:23:38 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/05 16:31:47 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/01/07 11:37:00 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,51 +27,51 @@ char	*create_stock(char *line)
 	return (stock);
 }
 
-void	quit_mode(char *stock, int *i, int *x, char *line, char **environ)
+void	quit_mode(char *stock, t_index **index)
 {
 	struct winsize size;
 
 	ioctl(0, TIOCGWINSZ, &size);
-	tputs(tgetstr("ei", NULL), 100, ft_putin);
+	tputs(tgetstr("ei", NULL), 1, ft_putin);
 	ft_strdel(&stock);
-	*i = home(*i, *x, size, environ);
-	*x = (int)ft_strlen(line);
-	ft_putstrin(line);
-	*i = *x;
-	tputs(tgetstr("im", NULL), 100, ft_putin);
+	home(index, size);
+	(*index)->x = (int)ft_strlen((*index)->line);
+	ft_putstrin((*index)->line);
+	(*index)->i = (*index)->x;
+	tputs(tgetstr("im", NULL), 1, ft_putin);
 }
 
-void	select_right(int *i, int *x, int prompt, char *stock, char *line)
+void	select_right(char *stock, t_index **index)
 {
 	struct winsize	size;
 
 	ioctl(0, TIOCGWINSZ, &size);
-	if (*i < *x)
+	(*index)->prompt = ft_atoi(ft_getenv((*index)->environ, "PROMPT"));
+	if ((*index)->i < (*index)->x)
 	{
-		*i = go_to_right(*i, *x, prompt, size);
-		copy_char(line, i, &stock);
+		go_to_right(index, size);
+		copy_char(index, &stock);
 	}
 }
 
-void	select_left(int *i, char *stock, char *line)
+void	select_left(char *stock, t_index **index)
 {
-	if (*i > 0)
+	if ((*index)->i > 0)
 	{
-		copy_char(line, i, &stock);
-		*i = go_to_left(*i);
+		copy_char(index, &stock);
+		(*index)->i = go_to_left((*index)->i);
 	}
 }
 
-void	select_mode(char *line, int *i, int *x, char ***environ)
+void	select_mode(t_index **index)
 {
 	char	buff[6];
 	char	*stock;
 	int		total;
-	int		prompt;
 
 	stock = NULL;
-	prompt = ft_atoi(ft_getenv(*environ, "PROMPT"));
-	stock = create_stock(line);
+	(*index)->prompt = ft_atoi(ft_getenv((*index)->environ, "PROMPT"));
+	stock = create_stock((*index)->line);
 	while (1)
 	{
 		ft_bzero(buff, 6);
@@ -79,14 +79,14 @@ void	select_mode(char *line, int *i, int *x, char ***environ)
 		total = buff[0] + buff[1] + buff[2] + buff[3] + buff[4] + buff[5];
 		if (total == ALT_S)
 		{
-			quit_mode(stock, i, x, line, *environ);
+			quit_mode(stock, index);
 			return ;
 		}
 		else if (total == RIGHT_ARROW)
-			select_right(i, x, prompt, stock, line);
+			select_right(stock, index);
 		else if (total == LEFT_ARROW)
-			select_left(i, stock, line);
+			select_left(stock, index);
 		if (total == ALT_C)
-			copy_select(stock, x, environ);
+			copy_select(stock, index);
 	}
 }

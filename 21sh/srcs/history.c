@@ -6,7 +6,7 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 13:00:48 by dquartin          #+#    #+#             */
-/*   Updated: 2017/12/17 11:07:01 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/01/07 12:29:07 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,25 +21,42 @@ t_hist	*stock_history(char *line, t_hist *list)
 	return (list);
 }
 
-int		back_history(int i, int *x, char **line, t_hist **list)
+void	back_history(t_index **index, t_hist **list)
 {
 	while ((*list) && (*list)->prev &&
 	(ft_strcmp((*list)->prev->histo, (*list)->histo) == 0))
 		*list = (*list)->prev;
 	if (*list)
 	{
-		i = call_delchar(i, x, *line);
-		ft_strdel(line);
+		call_delchar(index);
+		ft_strdel(&(*index)->line);
 		if ((*list)->prev)
 		{
 			*list = (*list)->prev;
-			*line = ft_strdup((*list)->histo);
-			ft_putstrin(*line);
-			(*x) = ft_strlen(*line);
-			i = (*x);
+			(*index)->line = ft_strdup((*list)->histo);
+			ft_putstrin((*index)->line);
+			(*index)->x = ft_strlen((*index)->line);
+			(*index)->i = (*index)->x;
 		}
 		else
-			*line = ft_strnew(10);
+			(*index)->line = ft_strnew(10000);
 	}
-	return (i);
+}
+
+void	history(t_index **index, t_hist **list)
+{
+	while ((*list) && (*list)->next &&
+			(ft_strcmp((*list)->next->histo, (*list)->histo) == 0))
+		*list = (*list)->next;
+	if (*list)
+	{
+		call_delchar(index);
+		ft_strdel(&(*index)->line);
+		(*index)->line = ft_strdup((*list)->histo);
+		ft_putstrin((*index)->line);
+		(*index)->x = ft_strlen((*index)->line);
+		(*index)->i = (*index)->x;
+		if ((*list)->next)
+			*list = (*list)->next;
+	}
 }

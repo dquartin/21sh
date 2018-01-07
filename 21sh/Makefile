@@ -6,7 +6,7 @@
 #    By: dquartin <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/12/06 17:31:58 by dquartin          #+#    #+#              #
-#    Updated: 2018/01/05 16:38:03 by dquartin         ###   ########.fr        #
+#    Updated: 2018/01/07 12:38:23 by dquartin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,7 +33,8 @@ SRCS = ft_splitall.c\
 	   ft_list.c\
 	   history.c\
 	   select_mode.c\
-	   copy_n_paste.c
+	   copy_n_paste.c\
+	   prompt_char.c
 SRCPATH = srcs
 OBJS = $(SRCS:.c=.o)
 RM = rm -rf

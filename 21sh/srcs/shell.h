@@ -6,7 +6,7 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/13 10:02:52 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/05 16:37:46 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/01/07 12:40:38 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,15 @@ typedef struct		s_hist
 	struct s_hist	*prev;
 }					t_hist;
 
+typedef struct		s_index
+{
+	char			*line;
+	char			**environ;
+	int				prompt;
+	int				i;
+	int				x;
+}					t_index;
+
 # define RIGHT_ARROW 185
 # define LEFT_ARROW 186
 # define UP_ARROW 183
@@ -43,51 +52,50 @@ typedef struct		s_hist
 # define ENTER 10
 # define ESCAPE 27
 
-char                *ft_getenv(char **env, char *elem);
-char                *ft_move(t_hist **list, char ***environ);
-char                *promptchar(char *buffer, char *line, int *x);
-char                **ft_cd(char *path, char ***environ);
-char                **ft_envcpy(char **env);
-char                **ft_splitwhite(char const *s);
-char                **ft_unsetenv(char *name, char **environ);
-char                **split_line(char *line);
-char                **split_paths(char **paths, char **environ);
-char                **split_semicolon(char *line);
+char				*ft_getenv(char **env, char *elem);
+char				*ft_move(t_hist **list, char ***environ);
+char				*promptchar(char *buffer, t_index **index);
+char				**ft_cd(char *path, char ***environ);
+char				**ft_envcpy(char **env);
+char				**ft_splitwhite(char const *s);
+char				**ft_unsetenv(char *name, char **environ);
+char				**split_line(char *line);
+char				**split_paths(char **paths, char **environ);
+char				**split_semicolon(char *line);
 
-int                 back_history(int i, int *x, char **line, t_hist **list);
-int                 begin(int i, int *x, int prompt, char *line);
-int                 call_delchar(int i, int *x, char *line);
-int                 end(int i, int x, struct winsize size, char **environ);
-int                 env_len(char **env);
-int                 ft_putin(int c);
-int                 go_to_right(int i, int x, int prompt, struct winsize size);
-int                 go_to_left(int i);
-int                 history(int i, int *x, char **line, t_hist **list);
-int                 home(int i, int x, struct winsize size, char **environ);
-int                 other_case(char **line, int i, int *x, char *buffer);
-int                 shift_down(int i, int *x, int prompt, char **environ);
-int                 shift_left(int i, char *line);
-int                 shift_right(int i, int x, int prompt, char *line);
-int                 shift_up(int i, struct winsize size);
+int					env_len(char **env);
+int					ft_putin(int c);
+int					go_to_left(int i);
+int					shift_up(int i, struct winsize size);
 
-t_hist              *ft_lstcreate(void const *content);
-t_hist              *stock_history(char *line, t_hist *list);
+t_hist				*ft_lstcreate(void const *content);
+t_hist				*stock_history(char *line, t_hist *list);
 
-void                call_fork(char **stock, char **paths, char **environ);
-void                copy_char(char *line, int *i, char **stock);
-void                copy_n_paste(char **line, int *i, int *x, char ***environ);
-void                copy_select(char *stock, int *x, char ***environ);
-void                delchar(int i, int prompt, char *line);
-void                delete_lines(char **stock);
-void                delinline(int i, char **line);
-void                exec_path(char **stock, char **environ);
-void                ft_echo(char **stock);
-void                ft_env(char **env);
-void                ft_lstaddnew(t_hist **alst, t_hist *new);
-void                ft_putstrin(char *str);
-void                ft_setenv(char *name, char *value, char ***environ);
-void                insertchar(int i, char **line, char *buffer);
-void                insert_char(int i, int prompt, char *line);
-void                select_mode(char *line, int *i, int *x, char ***environ);
+void				back_history(t_index **index, t_hist **list);
+void				begin(t_index **index);
+void				call_delchar(t_index **index);
+void				call_fork(char **stock, char **paths, char **environ);
+void				copy_char(t_index **index, char **stock);
+void				copy_n_paste(t_index **index);
+void				copy_select(char *stock, t_index **index);
+void				delchar(t_index **index);
+void				delete_lines(char **stock);
+void				delinline(t_index **index);
+void				end(t_index **index, struct winsize size);
+void				exec_path(char **stock, char **environ);
+void				ft_echo(char **stock);
+void				ft_env(char **env);
+void				ft_lstaddnew(t_hist **alst, t_hist *new);
+void				ft_putstrin(char *str);
+void				ft_setenv(char *name, char *value, char ***environ);
+void				go_to_right(t_index **index, struct winsize size);
+void				history(t_index **index, t_hist **list);
+void				home(t_index **index, struct winsize size);
+void				insertchar(t_index **index, char *buffer);
+void				other_case(t_index **index, char *buffer);
+void				select_mode(t_index **index);
+void				shift_down(t_index **index);
+void				shift_left(t_index **index);
+void				shift_right(t_index **index);
 
 #endif

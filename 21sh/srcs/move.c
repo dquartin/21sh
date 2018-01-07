@@ -6,140 +6,96 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/13 09:42:35 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/05 16:36:55 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/01/07 12:27:28 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
 
-void    insertchar(int i, char **line, char *buffer)
+void	ft_move_bis(t_index **index, t_hist **list,
+		char *buff, struct winsize size)
 {
-	char            *tmp;
-	int             j;
-	int             x;
-	int             k;
+	int		total;
 
-	j = 0;
-	x = ft_strlen(*line);
-	tmp = ft_strsub((*line), i, ft_strlen(*line));
-	(*line)[i] = buffer[0];
-	i++;
-	k = i;
-	//tputs(tgetstr("ei", NULL), 1, ft_putin);
-	ft_putstrin(tmp);
-	//tputs(tgetstr("im", NULL), 1, ft_putin);
-	i = ft_strlen(*line);
-	while (i != k)
-	{
-		tputs(tgetstr("le", NULL), 1, ft_putin);
-		i--;
-	}
-	while ((*line)[i])
-	{
-		(*line)[i] = tmp[j];
-		i++;
-		j++;
-	}
-	ft_strdel(&tmp);
+	total = buff[0] + buff[1] + buff[2] + buff[3] + buff[4] + buff[5];
+	if (total == HOME)
+		home(index, size);
+	else if (total == END)
+		end(index, size);
+	else if (total == UP_ARROW)
+		history(index, list);
+	else if (total == DOWN_ARROW)
+		back_history(index, list);
+	else if (total == SHIFT_RIGHT)
+		shift_right(index);
+	else if (total == SHIFT_LEFT)
+		shift_left(index);
+	else if (total == ALT_S)
+		select_mode(index);
+	else if (total == ALT_V)
+		copy_n_paste(index);
+	else if (total == SHIFT_UP && (*index)->x > size.ws_col)
+		(*index)->i = shift_up((*index)->i, size);
+	else if (total == SHIFT_DOWN && (*index)->x > size.ws_col)
+		shift_down(index);
+	else
+		other_case(index, buff);
 }
 
-void	delinline(int i, char **line)
+void	ft_move_int(t_index **index, t_hist **list,
+		char *buff, struct winsize size)
 {
-	while ((*line)[i + 1])
-	{
-		(*line)[i] = (*line)[i + 1];
-		i++;
-	}
-	(*line)[i] = '\0';
+	int			total;
+	t_hist		*beginlst;
+
+	beginlst = *list;
+	total = buff[0] + buff[1] + buff[2] + buff[3] + buff[4] + buff[5];
+	if (total != UP_ARROW && total != DOWN_ARROW)
+		*list = beginlst;
+	if (total == DEL)
+		begin(index);
+	else if (total == RIGHT_ARROW)
+		go_to_right(index, size);
+	else if (total == LEFT_ARROW)
+		(*index)->i = go_to_left((*index)->i);
+	else
+		ft_move_bis(index, list, buff, size);
 }
 
-void	delchar(int i, int prompt, char *line)
+void	init(t_index **index, char ***environ)
 {
-	struct winsize  size;
-
-	ioctl(0, TIOCGWINSZ, &size);
-	tputs(tgetstr("le", NULL), 0, ft_putin);
-	tputs(tgetstr("dc", NULL), 0, ft_putin);
-	delinline(i, &line);
-	i++;
-	if ((i + prompt) % size.ws_col == 0)
-	{
-		tputs(tgetstr("le", NULL), 0, ft_putin);
-		tputs(tgetstr("dc", NULL), 0, ft_putin);
-		tputs(tgetstr("dc", NULL), 0, ft_putin);
-		ft_putchar(line[i - 2]);
-		tputs(tgetstr("nd", NULL), 0, ft_putin);
-	}
-}
-
-char	*promptchar(char *buffer, char *line, int *x)
-{
-	if (*x % 10000 == 0)
-		line = ft_realloc(line, (int)ft_strlen(line), (int)(ft_strlen(line) + 10000));
-	write(0, &buffer[0], 1);
-	(*x)++;
-	return (line);
+	(*index)->environ = ft_envcpy(*environ);
+	(*index)->prompt = ft_atoi(ft_getenv(*environ, "PROMPT"));
+	(*index)->line = ft_strnew(20000);
+	(*index)->x = 0;
+	(*index)->i = (*index)->x;
 }
 
 char	*ft_move(t_hist **list, char ***environ)
 {
-	char	*line;
-	char	buff[7];
-	int		i;
-	int		x;
-	int		prompt;
-	int		total;
-	t_hist	*beginlst;
-	struct winsize  size;
+	char			buff[7];
+	int				total;
+	t_index			*index;
+	struct winsize	size;
 
 	ioctl(0, TIOCGWINSZ, &size);
-	prompt = ft_atoi(ft_getenv(*environ, "PROMPT"));
-	line = ft_strnew(2000);
-	beginlst = *list;
-	x = 0;
-	i = x;
+	if (!(index = (t_index*)malloc(sizeof(t_index))))
+		return (NULL);
+	init(&index, environ);
 	while (1)
 	{
 		ft_bzero(buff, 6);
 		read(0, buff, 6);
 		total = buff[0] + buff[1] + buff[2] + buff[3] + buff[4] + buff[5];
-		if (total != UP_ARROW && total != DOWN_ARROW)
-			*list = beginlst;
-		if (total == DEL)
-			i = begin(i, &x, prompt, line);
-		else if (total == ENTER)
+		if (total == ENTER)
 		{
 			ft_bzero(buff, 7);
-			if (i != x)
-				i = end(i, x, size, *environ);
-			return (line);
+			if (index->i != index->x)
+				end(&index, size);
+			return (index->line);
 		}
-		else if (total == RIGHT_ARROW)
-			i = go_to_right(i, x, prompt, size);
-		else if (total == LEFT_ARROW)
-			i = go_to_left(i);
-		else if (total == HOME)
-			i = home(i, x, size, *environ);
-		else if (total == END)
-			i = end(i, x, size, *environ);
-		else if (total == UP_ARROW)
-			i = history(i, &x, &line, list);
-		else if (total == DOWN_ARROW)
-			i = back_history(i, &x, &line, list);
-		else if (total == SHIFT_RIGHT)
-			i = shift_right(i, x, prompt, line);
-		else if (total == SHIFT_LEFT)
-			i = shift_left(i, line);
-		else if (total == ALT_S)
-			select_mode(line, &i, &x, environ);
-		else if (total == ALT_V)
-			copy_n_paste(&line, &i, &x, environ);
-		else if (total == SHIFT_UP && x > size.ws_col)
-			i = shift_up(i, size);
-		else if (total == SHIFT_DOWN && x > size.ws_col)
-			i = shift_down(i, &x, prompt, *environ);
 		else
-			i = other_case(&line, i, &x, buff);
+			ft_move_int(&index, list, buff, size);
 	}
 	return (NULL);
 }

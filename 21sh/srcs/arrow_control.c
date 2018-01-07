@@ -6,112 +6,73 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 09:25:59 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/05 16:25:02 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/01/07 12:32:21 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
 
-int		shift_right(int i, int x, int prompt, char *line)
+void	shift_right_bis(t_index **index, struct winsize size)
 {
-	struct winsize  size;
-	int             nb;
+	while ((*index)->line[(*index)->i + 1] > 32 &&
+	((*index)->i + (*index)->prompt) % size.ws_col != 0)
+	{
+		tputs(tgetstr("nd", NULL), 1, ft_putin);
+		(*index)->i++;
+	}
+	if (((*index)->i + (*index)->prompt) % size.ws_col == 0)
+	{
+		tputs(tgetstr("do", NULL), 1, ft_putin);
+		while ((*index)->line[(*index)->i + 1] > 32 &&
+		(*index)->i != (*index)->x)
+		{
+			tputs(tgetstr("nd", NULL), 1, ft_putin);
+			(*index)->i++;
+		}
+	}
+	tputs(tgetstr("nd", NULL), 1, ft_putin);
+	(*index)->i++;
+}
+
+void	shift_right(t_index **index)
+{
+	struct winsize	size;
+	int				nb;
 
 	nb = 1;
+	(*index)->prompt = ft_atoi(ft_getenv((*index)->environ, "PROMPT"));
 	ioctl(0, TIOCGWINSZ, &size);
-	if (i < x)
+	if ((*index)->i < (*index)->x)
 	{
-		if (x + prompt > size.ws_col)
-		{
-			while (line[i + 1] > 32 && (i + prompt) % size.ws_col != 0)
-			{
-				tputs(tgetstr("nd", NULL), 1, ft_putin);
-				i++;
-			}
-			if ((i + prompt) % size.ws_col == 0)
-			{
-				tputs(tgetstr("do", NULL), 1, ft_putin);
-				while (line[i + 1] > 32 && i != x)
-				{
-					tputs(tgetstr("nd", NULL), 1, ft_putin);
-					i++;
-				}
-			}
-			tputs(tgetstr("nd", NULL), 1, ft_putin);
-			i++;
-		}
+		if ((*index)->x + (*index)->prompt > size.ws_col)
+			shift_right_bis(index, size);
 		else
 		{
-			while (line[i + 1] > 32 && (i + prompt) % size.ws_col != 0)
+			while ((*index)->line[(*index)->i + 1] > 32 &&
+			((*index)->i + (*index)->prompt) % size.ws_col != 0)
 			{
 				tputs(tgetstr("nd", NULL), 1, ft_putin);
-				i++;
+				(*index)->i++;
 			}
 			tputs(tgetstr("nd", NULL), 1, ft_putin);
-			i++;
+			(*index)->i++;
 		}
 	}
-	return (i);
 }
 
-int		shift_left(int i, char *line)
+void	shift_left(t_index **index)
 {
-	if (i > 0)
+	if ((*index)->i > 0)
 	{
-		while (line[i - 1] > 32)
+		while ((*index)->line[(*index)->i - 1] > 32)
 		{
-			tputs(tgetstr("le", NULL), 100, ft_putin);
-			i--;
+			tputs(tgetstr("le", NULL), 1, ft_putin);
+			(*index)->i--;
 		}
-		if (i != 0)
+		if ((*index)->i != 0)
 		{
-			tputs(tgetstr("le", NULL), 100, ft_putin);
-			i--;
+			tputs(tgetstr("le", NULL), 1, ft_putin);
+			(*index)->i--;
 		}
 	}
-	return (i);
-}
-
-int		history(int i, int *x, char **line, t_hist **list)
-{
-	while ((*list) && (*list)->next &&
-			(ft_strcmp((*list)->next->histo, (*list)->histo) == 0))
-		*list = (*list)->next;
-	if (*list)
-	{
-		i = call_delchar(i, x, *line);
-		ft_strdel(line);
-		*line = ft_strdup((*list)->histo);
-		ft_putstrin(*line);
-		(*x) = ft_strlen(*line);
-		i = (*x);
-		if ((*list)->next)
-			*list = (*list)->next;
-	}
-	return (i);
-}
-
-int		call_delchar(int i, int *x, char *line)
-{
-	while ((*x) > 0)
-	{
-
-		tputs(tgetstr("le", NULL), 1, ft_putin);
-		tputs(tgetstr("dc", NULL), 1, ft_putin);
-		delinline(i - 1, &line);
-		(*x)--;
-		i--;
-	}
-	return (i);
-}
-
-int		begin(int i, int *x, int prompt, char *line)
-{
-	if (i > 0)
-	{
-		delchar(i - 1, prompt, line);
-		(*x)--;
-		i--;
-	}
-	return (i);
 }

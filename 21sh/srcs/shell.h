@@ -6,7 +6,7 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/13 10:02:52 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/07 12:40:38 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/01/08 16:21:29 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,19 @@ typedef struct		s_index
 	int				i;
 	int				x;
 }					t_index;
+
+typedef enum		e_type
+{
+	    PIPE, SEMICOLON, REDIRL, REDIRR, DREDIRL, DREDIRR, DATA
+}                	t_type;
+
+typedef struct		s_tree
+{
+	struct s_tree	*left;
+	struct s_tree	*right;
+	t_type			type;
+	char			*content;
+}					t_tree;
 
 # define RIGHT_ARROW 185
 # define LEFT_ARROW 186
@@ -70,6 +83,7 @@ int					shift_up(int i, struct winsize size);
 
 t_hist				*ft_lstcreate(void const *content);
 t_hist				*stock_history(char *line, t_hist *list);
+t_tree				*new_parser(char *line);
 
 void				back_history(t_index **index, t_hist **list);
 void				begin(t_index **index);

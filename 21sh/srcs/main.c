@@ -6,7 +6,7 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/07 14:02:56 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/07 12:41:13 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/01/08 16:28:00 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,36 +75,54 @@ char	**cpy_environ(char **av, char **env)
 	return (environ);
 }
 
-void	ft_major(char ***semitab, char ***paths, char ***stock, char ***environ)
+void	ft_major(t_tree *tree, char ***paths, char ***stock, char ***environ)
 {
 	int		i;
 
 	i = 0;
-	if (*semitab)
+	*paths = split_paths(*paths, *environ);
+	if (tree->type == DATA)
 	{
-		while ((*semitab)[i])
+		*stock = ft_splitwhite(tree->content);
+		if (ft_strcmp("exit", (*stock)[0]) == 0)
 		{
-			*paths = split_paths(*paths, *environ);
-			*stock = ft_splitwhite((*semitab)[i]);
-			if (*stock[0] == NULL)
-			{
-				delete_lines(*stock);
-				delete_lines(*semitab);
-				delete_lines(*paths);
-				return ;
-			}
-			if (ft_strcmp("exit", (*stock)[0]) == 0)
-			{
-				ft_putcolor("Good bye ! 🖖\n", WHITE);
-				delete_lines(*stock);
-				exit(0);
-			}
-			call_function(*stock, *paths, environ);
-			i++;
+			ft_putcolor("Good bye ! 🖖\n", WHITE);
+			//	delete_lines(*stock);
+			exit(0);
 		}
-		delete_lines(*semitab);
+		call_function(*stock, *paths, environ);
+	}
+	if (tree->type == SEMICOLON)
+	{
+		ft_major(tree->left, paths, stock, environ);
+		ft_major(tree->right, paths, stock, environ);
 	}
 }
+/*if (*semitab)
+  {
+  while ((*semitab)[i])
+  {
+ *paths = split_paths(*paths, *environ);
+ *stock = ft_splitwhite((*semitab)[i]);
+ if (*stock[0] == NULL)
+ {
+ delete_lines(*stock);
+ delete_lines(*semitab);
+ delete_lines(*paths);
+ return ;
+ }
+ if (ft_strcmp("exit", (*stock)[0]) == 0)
+ {
+ ft_putcolor("Good bye ! 🖖\n", WHITE);
+ delete_lines(*stock);
+ exit(0);
+ }
+ call_function(*stock, *paths, environ);
+ i++;
+ }
+ delete_lines(*semitab);
+ }
+ }*/
 
 int		main(int ac, char **av, char **env)
 {
@@ -114,8 +132,10 @@ int		main(int ac, char **av, char **env)
 	char	**paths;
 	char	**semitab;
 	struct termios	term;
+	t_tree	*tree;
 	t_hist	*list;
 
+	tree = NULL;
 	paths = NULL;
 	line = NULL;
 	list = NULL;
@@ -137,9 +157,10 @@ int		main(int ac, char **av, char **env)
 		line = ft_move(&list, &environ);
 		list = stock_history(line, list);
 		tputs(tgetstr("ei", NULL), 100, ft_putin);
+		tree = new_parser(line);
+		//semitab = split_semicolon(line);
 		ft_putchar('\n');
-		semitab = split_semicolon(line);
-		ft_major(&semitab, &paths, &stock, &environ);
+		ft_major(tree, &paths, &stock, &environ);
 	}
 	delete_lines(environ);
 	return (0);

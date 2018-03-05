@@ -6,7 +6,7 @@
 /*   By: hlely <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/25 11:00:28 by hlely             #+#    #+#             */
-/*   Updated: 2018/01/29 14:45:19 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/02/28 15:48:54 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@ static void	paste_at_end(t_index **index, char *cpy)
 
 static void	ft_put_end(char **tmp, t_index **index, char **new)
 {
-	tputs(tgetstr("sc", NULL), 1, ft_putin);
-	tputs(tgetstr("cd", NULL), 1, ft_putin);
+	GO("sc");
+	GO(CLR);
 	*tmp = ft_strnew(10000);
 	*tmp = ft_strncpy(*tmp, (*index)->line, (*index)->i);
 	ft_strdel(&(*index)->line);
@@ -34,7 +34,7 @@ static void	ft_put_end(char **tmp, t_index **index, char **new)
 	(*index)->line = ft_strcpy((*index)->line, *tmp);
 	(*index)->line = ft_strcat((*index)->line, *new);
 	ft_putstrin(*new);
-	tputs(tgetstr("rc", NULL), 1, ft_putin);
+	GO("rc");
 	ft_strdel(tmp);
 }
 
@@ -84,8 +84,8 @@ void		copy_char(t_index **index, char **stock)
 	char	tmp;
 
 	tmp = (*index)->line[(*index)->i - 1];
-	tputs(tgetstr("le", NULL), 0, ft_putin);
-	tputs(tgetstr("dc", NULL), 0, ft_putin);
+	GO(LEFT);
+	GO("dc");
 	if ((*stock)[(*index)->i - 1] == '\0')
 	{
 		(*stock)[(*index)->i - 1] = tmp;

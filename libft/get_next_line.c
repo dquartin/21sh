@@ -6,7 +6,7 @@
 /*   By: dquartin <marvin@41.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/11/22 13:44:13 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/24 11:59:11 by hlely            ###   ########.fr       */
+/*   Updated: 2018/03/01 13:34:06 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ char	*fill(int res, int fd, char *buffer, char *stock)
 			ft_bzero(buffer, BUFF_SIZE);
 			res = read(fd, buffer, BUFF_SIZE);
 			stock = ft_realloc(stock, (int)ft_strlen(stock),
-					(int)(ft_strlen(stock) + BUFF_SIZE));
+					(int)(ft_strlen(stock) + BUFF_SIZE + 1));
 			i = 0;
 		}
 		while (i < BUFF_SIZE)

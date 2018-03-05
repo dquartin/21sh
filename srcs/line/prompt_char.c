@@ -6,7 +6,7 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/07 12:26:05 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/29 14:45:33 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/02/28 16:45:46 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,13 +50,13 @@ void	insertchar(t_index **index, char *buffer)
 	(*index)->i++;
 	if ((*index)->i < (*index)->x)
 	{
-		if (((*index)->i + (*index)->prompt) % size.ws_col == 0)
-			tputs(tgetstr("do", NULL), 1, ft_putin);
-		tputs(tgetstr("sc", NULL), 1, ft_putin);
-		tputs(tgetstr("ei", NULL), 1, ft_putin);
+		if (CHECKSIZE((*index)->i) == 0)
+			GO(DOWN);
+		GO("sc");
+		GO("ei");
 		ft_putstrin((*index)->line + (*index)->i);
-		tputs(tgetstr("im", NULL), 1, ft_putin);
-		tputs(tgetstr("rc", NULL), 1, ft_putin);
+		GO("im");
+		GO("rc");
 	}
 	(*index)->i--;
 }

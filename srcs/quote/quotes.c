@@ -6,7 +6,7 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/09 14:20:50 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/29 14:36:51 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/03/01 13:59:35 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,11 @@
 
 static char	*little_loop(char *line, char **new, char ***environ, t_hist *list)
 {
+	set_termios();
 	*new = ft_move(&list, environ);
+	SAVETERM;
 	line = ft_realloc(line, ft_strlen(line),
-			ft_strlen(line) + ft_strlen(*new) + 1);
+			ft_strlen(line) + ft_strlen(*new) + 2);
 	line = ft_strcat(line, "\n");
 	line = ft_strcat(line, *new);
 	return (line);
@@ -25,14 +27,15 @@ static char	*little_loop(char *line, char **new, char ***environ, t_hist *list)
 static char	*loop(char *line, char **new, char ***environ, t_hist *list)
 {
 	ft_strdel(new);
-	ft_putcolor("> ", LIGHT_MAGENTA);
-	ft_setenv("PROMPT", "2", environ);
+	ft_putstrin("> ");
+	SETPROMPT("2");
+	set_termios();
 	*new = ft_move(&list, environ);
+	SAVETERM;
 	line = ft_realloc(line, ft_strlen(line),
-			ft_strlen(line) + ft_strlen(*new) + 1);
+			ft_strlen(line) + ft_strlen(*new) + 2);
 	line = ft_strcat(line, "\n");
 	line = ft_strcat(line, *new);
-	ft_putchar('\n');
 	return (line);
 }
 
@@ -89,13 +92,12 @@ char		*dquote(char *line, char c, char ***environ, t_hist *list)
 		{
 			ft_strdel(&prompt);
 			prompt = find_prompt(c);
-			ft_putcolor(prompt, LIGHT_MAGENTA);
+			ft_putstrin(prompt);
 			tmp = ft_itoa(ft_strlen(prompt));
-			ft_setenv("PROMPT", tmp, environ);
+			SETPROMPT(tmp);
 			ft_strdel(&tmp);
 			ft_strdel(&new);
 			line = little_loop(line, &new, environ, list);
-			ft_putchar('\n');
 		}
 		del_quotes(&new, &prompt);
 	}

@@ -6,7 +6,7 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/25 12:06:38 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/29 14:25:46 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/02/28 16:02:46 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ void	init_std(t_std **std)
 
 void	set_std(t_std *std, char **line, char ***environ)
 {
+	g_heredoc = 0;
 	dup2(std->stin, 0);
 	dup2(std->stout, 1);
 	dup2(std->sterr, 2);
@@ -48,8 +49,9 @@ void	env_null(char ***environ)
 {
 	if ((*environ)[0] == NULL)
 	{
-		ft_puterror("Error: environement is not initialized.");
+		ERROR("Error: environement is not initialized. Exiting...");
 		free(*environ);
+		exit(EXIT_FAILURE);
 		*environ = set_environ();
 	}
 }
@@ -61,7 +63,8 @@ t_hist	*init_list(char ***environ, char **av, char **env, t_std **std)
 
 	*environ = cpy_environ(av, env);
 	env_null(environ);
-	login = ft_getenv(*environ, "USER");
+	if ((login = ft_getenv(*environ, "USER")) == NULL)
+		login = ft_strdup("Unknow_user");
 	ft_putstr("Welcome ");
 	ft_putstr(login);
 	ft_putstr(" !\n");

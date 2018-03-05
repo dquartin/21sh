@@ -6,7 +6,7 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/12 14:48:45 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/29 14:45:40 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/03/01 13:57:33 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,16 +26,14 @@ void	ctrl_c_bis(int i)
 
 void	ctrl_d(t_index *index, char buff[])
 {
-	struct termios term;
-
 	if (index->line[0] == '\0')
 	{
 		ft_bzero(buff, 7);
-		tputs(tgetstr("ei", NULL), 1, ft_putin);
-		tcgetattr(0, &term);
-		term.c_lflag = (ICANON | ECHO);
-		tcsetattr(0, 0, &term);
-		exit(0);
+		GO("ei");
+		SAVETERM;
+		if (!g_heredoc)
+			exit(0);
+		g_heredoc = 2;
 	}
 }
 
@@ -50,6 +48,7 @@ char	*ctrl_c_move(t_index *index, char buff[])
 	ft_strdel(&(index->line));
 	delete_lines(&(index->environ));
 	free(index->environ);
+	ft_lst_clear(&(index->start));
 	free(index);
 	line = ft_strnew(100);
 	return (line);
@@ -61,10 +60,10 @@ void	handle_segv(pid_t fath)
 	{
 		if (WIFSIGNALED(fath))
 		{
-			(WTERMSIG(fath) == SIGABRT) ? ft_putstr("21sh : Abort\n") : 0;
-			(WTERMSIG(fath) == SIGBUS) ? ft_putstr("21sh : Bus error\n") : 0;
+			(WTERMSIG(fath) == SIGABRT) ? ERROR("21sh : Abort") : 0;
+			(WTERMSIG(fath) == SIGBUS) ? ERROR("21sh : Bus error") : 0;
 			(WTERMSIG(fath) == SIGSEGV) ?
-				ft_putstr("21sh : Segmentation fault\n") : 0;
+				ERROR("21sh : Segmentation fault") : 0;
 		}
 	}
 }

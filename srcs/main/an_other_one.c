@@ -6,7 +6,7 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/25 13:21:08 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/29 17:03:30 by hlely            ###   ########.fr       */
+/*   Updated: 2018/02/12 11:25:59 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,20 +45,40 @@ void	alloc(t_all **all, t_truct **str, char ***environ)
 	if (!((*str)->std = (t_std*)malloc(sizeof(t_std))))
 		return ;
 	*environ = NULL;
+	g_list = NULL;
+	g_status = 1;
 }
 
 void	main_check_line(t_all **all, char ***environ, t_truct **str)
 {
+	ft_putchar('\n');
 	if ((*all)->line[0] != '\0')
 	{
-		init_line(&((*all)->line), environ, &((*str)->list), &((*str)->tree));
+		init_line(&((*all)->line), environ, &g_list, &((*str)->tree));
 		if (ft_strcmp("exit", (*all)->line) == 0)
 		{
-			if_exit(*environ, &((*all)->paths), &((*str)->list));
+			if_exit(*environ, &((*all)->paths), &((*all)->stock), &g_list);
+			ft_strdel(&(*all)->line);
+			free(*all);
+			free((*str)->std);
+			delete_tree(&((*str)->tree));
+			free(*str);
 			exit(0);
 		}
 		call_major(&((*all)->paths), &((*all)->stock),
 				&((*str)->tree), environ);
 		ft_strdel(&((*all)->line));
 	}
+}
+
+void	call_handle(t_tree *tree, char ***paths, char ***stock, char ***environ)
+{
+	if (tree->type == ET)
+		handle_and(tree, paths, stock, environ);
+	if (tree->type == OU)
+		handle_or(tree, paths, stock, environ);
+	if (tree->type == SEMICOLON)
+		handle_semicolon(tree, paths, stock, environ);
+	if (tree->type == PIPE)
+		handle_pipe(tree, stock, paths, environ);
 }

@@ -6,7 +6,7 @@
 #    By: dquartin <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/11/08 12:05:37 by dquartin          #+#    #+#              #
-#    Updated: 2017/12/09 11:47:24 by dquartin         ###   ########.fr        #
+#    Updated: 2018/03/01 13:18:46 by dquartin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,6 +15,8 @@ CC = gcc
 FLAGS = -Wall -Wextra -Werror
 OPTIONS = -c
 SRCS = ft_puterror.c\
+	   ft_countstr.c\
+	   ft_strreplace.c\
 	   ft_putcolor.c\
 	   ft_putnbrcolornl_c.c\
 	   ft_strjoindel.c\
@@ -85,28 +87,39 @@ SRCS = ft_puterror.c\
 	   ft_putnbr_base.c\
 	   ft_itoa_base.c\
 	   ft_touppercase.c\
-	   ft_tolowercase.c
+	   ft_tolowercase.c\
+	   ft_strnrstr.c
 OBJS = $(SRCS:.c=.o)
-RM = rm -rf
+	RM = rm -rf
 
 MAKEFLAGS = s
+
+Y = "\033[33m"
+R = "\033[31m"
+G = "\033[32m"
+B = "\033[34m"
+X = "\033[0m"
+UP = "\033[A"
+CUT = "\033[K"
 
 all: $(NAME)
 
 %.o: %.c
-	$(CC) $(FLAGS) -c $< -o $@
+	@echo ${Y}Compiling [$@]...${X}
+	@$(CC) $(FLAGS) -c $< -o $@
+	@printf ${UP}${CUT}
 
 $(NAME): $(OBJS)
-		@ar rc $(NAME) $(OBJS)
-		@ranlib $(NAME)
-		@echo "\033[01;32mCompilation de la libft...\033[0m"
+	@ar rc $(NAME) $(OBJS)
+	@ranlib $(NAME)
+	@echo "\033[01;32mCompilation de la libft OK.\033[0m"
 
 clean :
-		@$(RM) $(OBJS)
-		@echo "\033[01;31mSuppression des objets de la libft...\033[0m"
+	@$(RM) $(OBJS)
+	@echo "\033[01;31mSuppression des objets de la libft...\033[0m"
 
 fclean:	clean
-		@$(RM) $(NAME)
-		@echo "\033[01;31mSuppression de l'executable libft.a...\033[0m"
+	@$(RM) $(NAME)
+	@echo "\033[01;31mSuppression de l'executable libft.a...\033[0m"
 
 re : fclean all

@@ -6,7 +6,7 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/13 09:42:35 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/29 17:15:30 by hlely            ###   ########.fr       */
+/*   Updated: 2018/02/28 15:49:42 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,11 @@ void	ft_move_int(t_index **index, t_hist **list,
 	if (total != UP_ARROW && total != DOWN_ARROW)
 		*list = beginlst;
 	if (total == DEL)
+	{
 		begin(index);
-	else if (total == TAB)
-		complete_line(index);
+		if ((*index)->i > 0)
+			ft_lst_clear(&((*index)->start));
+	}
 	else if (total == RIGHT_ARROW)
 		go_to_right(index, size);
 	else if (total == LEFT_ARROW)
@@ -107,18 +109,17 @@ char	*ft_move(t_hist **list, char ***environ)
 	struct winsize	size;
 
 	ioctl(0, TIOCGWINSZ, &size);
-	if (!(index = (t_index*)malloc(sizeof(t_index))))
-		return (NULL);
+	CHECKMC(index = (t_index*)malloc(sizeof(t_index)));
 	init(&index, environ);
 	while (1)
 	{
 		ft_bzero(buff, 6);
 		read(0, buff, 6);
 		total = buff[0] + buff[1] + buff[2] + buff[3] + buff[4] + buff[5];
-		if (total == ENTER)
-			return (enter(index, list, environ, size));
 		if (total == CTRL_D)
 			ctrl_d(index, buff);
+		if (total == ENTER || g_heredoc == 2)
+			return (enter(index, list, environ, size));
 		if (total == CTRL_C)
 			return (ctrl_c_move(index, buff));
 		else

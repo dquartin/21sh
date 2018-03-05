@@ -6,7 +6,7 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/15 09:23:38 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/29 14:45:12 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/02/28 15:59:07 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,13 @@ static void	quit_mode(char *stock, t_index **index)
 	struct winsize size;
 
 	ioctl(0, TIOCGWINSZ, &size);
-	tputs(tgetstr("ei", NULL), 1, ft_putin);
+	GO("ei");
 	ft_strdel(&stock);
 	home(index, size);
 	(*index)->x = (int)ft_strlen((*index)->line);
 	ft_putstrin((*index)->line);
 	(*index)->i = (*index)->x;
-	tputs(tgetstr("im", NULL), 1, ft_putin);
+	GO("im");
 }
 
 static void	select_right(char *stock, t_index **index)

@@ -6,7 +6,7 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/08 14:00:38 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/29 14:41:18 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/02/28 13:31:41 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,16 +86,16 @@ char			**ft_splitwhite(char const *s)
 	char	**semitab;
 
 	if (!s)
-		return (0);
+		return (NULL);
 	if (s[0] == '\0')
 	{
 		if (!(semitab = (char**)malloc(sizeof(char*))))
-			return (0);
+			return (NULL);
 		semitab[0] = NULL;
 		return (semitab);
 	}
 	if (!(semitab = (char**)malloc(sizeof(char*) * ((count_words(s) + 1)))))
-		return (0);
+		return (NULL);
 	substitute_loop(s, semitab);
 	return (semitab);
 }

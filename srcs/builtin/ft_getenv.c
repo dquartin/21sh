@@ -6,7 +6,7 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/05 15:50:50 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/29 14:31:29 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/02/28 15:13:13 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,8 @@ char	*ft_getenv(char **env, char *elem)
 		comp = ft_strndup(env[i], '=');
 		if (ft_strcmp(comp, elem) == 0)
 		{
-			ret = ft_strsub(env[i], (ft_strlen(comp) + 1), ft_strlen(env[i]));
+			ret = ft_strsub(env[i], (ft_strlen(comp) + 1),
+			ft_strlen(env[i]) - 1);
 			ft_strdel(&comp);
 			return (ret);
 		}

@@ -6,7 +6,7 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/06 11:29:05 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/29 14:31:17 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/02/28 15:12:48 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,11 @@ int			env_len(char **env)
 	int		i;
 
 	i = 0;
-	while (env[i])
-		i++;
+	if (env)
+	{
+		while (env[i])
+			i++;
+	}
 	return (i);
 }
 
@@ -28,8 +31,7 @@ char		**ft_envcpy(char **env)
 	int		i;
 
 	i = 0;
-	if (!(environ = (char**)malloc(sizeof(char*) * (env_len(env) + 1))))
-		return (NULL);
+	CHECKMC(environ = (char**)malloc(sizeof(char*) * (env_len(env) + 1)));
 	while (env[i])
 	{
 		environ[i] = ft_strdup(env[i]);
@@ -57,6 +59,7 @@ static void	ft_env_u(char ***environ, char **stock, char **paths)
 	char	**env;
 
 	i = 0;
+	env = NULL;
 	if (stock[2])
 	{
 		env = ft_envcpy(*environ);
@@ -67,9 +70,15 @@ static void	ft_env_u(char ***environ, char **stock, char **paths)
 			call_function(stock + 3, paths, &env, 0);
 	}
 	else
-		ft_puterror("env: option requires an argument -- u");
-	delete_lines(&env);
-	free(env);
+	{
+		g_status = 0;
+		ERROR("env: option requires an argument -- u");
+	}
+	if (env)
+	{
+		delete_lines(&env);
+		free(env);
+	}
 	env = NULL;
 }
 
@@ -83,7 +92,7 @@ void		ft_env(char ***environ, char **stock, char **paths)
 	if (stock[1] != '\0')
 	{
 		if (ft_strcmp(stock[1], "--help") == 0)
-			ft_putstr("usage: env [-i] [-u name] [argument ...]\n");
+			help_env();
 		else if (ft_strcmp(stock[1], "-u") == 0)
 			ft_env_u(environ, stock, paths);
 		else if (ft_strcmp(stock[1], "-i") == 0)
@@ -91,6 +100,8 @@ void		ft_env(char ***environ, char **stock, char **paths)
 			if (stock[2])
 				call_function(stock + 2, paths, &array, 0);
 		}
+		else if (ft_strchr(stock[1], '=') != NULL)
+			ft_env_launch(stock, environ, paths);
 		else
 			call_function(stock + 1, paths, environ, 0);
 		free(array);

@@ -6,7 +6,7 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/06 15:51:46 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/29 14:31:44 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/02/28 15:14:04 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,10 @@ static int	unsetint(char **environ, int i, char *tmp)
 
 static void	error_case(char *name)
 {
+	g_status = 0;
 	ft_putstrerror("Error: ");
 	ft_putstrerror(name);
-	ft_puterror(" doesn't exist in env.🤦🏻‍♀️ ");
+	ERROR(" doesn't exist in env.🤦🏻‍♀️ ");
 }
 
 static char	**cpy_semitab(char **environ, int i, char *tmp)
@@ -70,7 +71,7 @@ char		**ft_unsetenv(char *name, char **environ)
 	semitab = NULL;
 	if (!name)
 	{
-		ft_puterror("Error: Unsetenv takes a name as argument.🤷🏻");
+		error_unsetenv();
 		return (environ);
 	}
 	tmp = ft_strdup(name);

@@ -6,19 +6,34 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/25 10:58:02 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/29 14:25:30 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/02/28 16:22:41 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../shell.h"
 
-void	if_exit(char **environ, char ***paths, t_hist **list)
+extern struct termios	g_save_attr;
+
+void	if_exit(char **environ, char ***paths, char ***stock, t_hist **list)
 {
 	save_history(*list, environ);
+	ft_hst_clear(list);
+	delete_alias(g_alias, environ);
+	if (*stock)
+	{
+		delete_lines(stock);
+		free(*stock);
+	}
 	if (*paths)
+	{
 		delete_lines(paths);
+		free(*paths);
+	}
 	if (environ)
+	{
 		delete_lines(&environ);
+		free(environ);
+	}
 	ft_putcolor("Good bye ! 🖖\n", WHITE);
 }
 
@@ -46,22 +61,19 @@ void	set_null(t_tree **tree, t_all **all, t_hist **list, int ac)
 	*list = NULL;
 }
 
-void	set_signal_father(pid_t father)
-{
-	signal(18, SIG_IGN);
-	signal(SIGQUIT, SIG_IGN);
-	signal(SIGINT, ctrl_c_bis);
-	waitpid(father, 0, 0);
-}
-
-void	set_terminal(t_all *all, t_truct *str, char ***environ)
+void	set_terminal(t_all *all, char ***environ)
 {
 	struct termios	term;
+	char			*tmp;
 
 	signal(18, SIG_IGN);
 	signal(SIGQUIT, SIG_IGN);
-	signal(SIGINT, ctrl_c);
-	tgetent(NULL, getenv("TERM"));
+	signal(SIGINT, SIG_IGN);
+	ft_setenv("term", "xterm", environ);
+	tmp = ft_getenv(*environ, "TERM");
+	tgetent(NULL, tmp);
+	ft_strdel(&tmp);
+	tcgetattr(0, &g_save_attr);
 	tcgetattr(0, &term);
 	term.c_lflag &= ~(ICANON);
 	term.c_lflag &= ~(ECHO);
@@ -69,7 +81,8 @@ void	set_terminal(t_all *all, t_truct *str, char ***environ)
 	term.c_cc[VMIN] = 1;
 	term.c_cc[VTIME] = 0;
 	tcsetattr(0, TCSADRAIN, &term);
-	tputs(tgetstr("im", NULL), 100, ft_putin);
-	all->line = ft_move(&(str->list), environ);
-	tputs(tgetstr("ei", NULL), 100, ft_putin);
+	GO("im");
+	all->line = ft_move(&g_list, environ);
+	GO("ei");
+	SAVETERM;
 }

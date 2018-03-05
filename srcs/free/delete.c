@@ -6,7 +6,7 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/08 08:59:49 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/29 14:39:08 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/02/28 16:45:08 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,23 +44,23 @@ void	delchar(t_index **index)
 	ioctl(0, TIOCGWINSZ, &size);
 	if ((*index)->i > 0)
 	{
-		tputs(tgetstr("le", NULL), 0, ft_putin);
-		tputs(tgetstr("dc", NULL), 0, ft_putin);
+		GO(LEFT);
+		GO(CLR);
 		delinline(index);
-		if (((*index)->i + (*index)->prompt) % size.ws_col == 0)
+		if (CHECKSIZE((*index)->i) == 0)
 		{
-			tputs(tgetstr("le", NULL), 0, ft_putin);
-			tputs(tgetstr("dc", NULL), 0, ft_putin);
-			tputs(tgetstr("dc", NULL), 0, ft_putin);
+			GO(LEFT);
+			GO(SUP);
+			GO(SUP);
 			ft_putchar((*index)->line[(*index)->i - 2]);
-			tputs(tgetstr("nd", NULL), 0, ft_putin);
+			GO(RIGHT);
 		}
-		tputs(tgetstr("cd", NULL), 0, ft_putin);
-		tputs(tgetstr("sc", NULL), 0, ft_putin);
-		tputs(tgetstr("ei", NULL), 0, ft_putin);
+		GO(CLR);
+		GO("sc");
+		GO("ei");
 		ft_putstrin((*index)->line + (*index)->i - 1);
-		tputs(tgetstr("im", NULL), 0, ft_putin);
-		tputs(tgetstr("rc", NULL), 0, ft_putin);
+		GO("im");
+		GO("rc");
 	}
 }
 
@@ -68,8 +68,8 @@ void	call_delchar(t_index **index)
 {
 	while ((*index)->x > 0)
 	{
-		tputs(tgetstr("le", NULL), 1, ft_putin);
-		tputs(tgetstr("dc", NULL), 1, ft_putin);
+		GO(LEFT);
+		GO(SUP);
 		delinline(index);
 		(*index)->x--;
 		(*index)->i--;

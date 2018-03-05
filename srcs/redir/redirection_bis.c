@@ -6,7 +6,7 @@
 /*   By: dquartin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/11 10:16:18 by dquartin          #+#    #+#             */
-/*   Updated: 2018/01/29 14:35:08 by dquartin         ###   ########.fr       */
+/*   Updated: 2018/02/28 14:36:58 by dquartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ int		reverse_bis(char **arr, int i, int *fd)
 			*fd = open(arr[i + 1], O_RDONLY);
 		else
 		{
-			ft_putstrerror("Permission denied.\n");
+			ERROR("Permission denied.");
 			return (0);
 		}
 	}
@@ -37,7 +37,7 @@ int		closing_redir(char **arr, int i)
 {
 	int		fd;
 
-	if (arr[i][3] == '-')
+	if (arr[i][3] == LESS)
 	{
 		arr[i][1] = '\0';
 		close(ft_atoi(arr[i]));
@@ -53,7 +53,7 @@ int		closing_redir(char **arr, int i)
 
 void	double_redir(char **arr, int i, int fd)
 {
-	if (arr[i][0] == '&')
+	if (arr[i][0] == AND)
 	{
 		dup2(fd, 1);
 		dup2(fd, 2);
@@ -64,20 +64,20 @@ void	double_redir(char **arr, int i, int fd)
 
 void	close_all(char **arr, int i)
 {
-	if (arr[i][0] == '&')
+	if (arr[i][0] == AND)
 	{
 		close(1);
 		close(2);
 	}
-	else if (arr[i][0] == '>' && arr[i][1] == '&')
+	else if (arr[i][0] == SIMPLE_RED && arr[i][1] == AND)
 		close(1);
 }
 
 void	open_file(char **arr, int i, int fd)
 {
-	if (arr[i][1] == '>' && arr[i][0] == '>')
-		fd = open(arr[i + 1], O_RDWR | O_APPEND | O_CREAT, 0644);
+	if (arr[i][1] == SIMPLE_RED && arr[i][0] == SIMPLE_RED)
+		fd = open(arr[i + 1], APPEND);
 	else
-		fd = open(arr[i + 1], O_RDWR | O_TRUNC | O_CREAT, 0644);
+		fd = open(arr[i + 1], TRUNC);
 	dup2(fd, 1);
 }
